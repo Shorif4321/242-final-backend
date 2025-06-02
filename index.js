@@ -1,12 +1,18 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const cors = require('cors')
+require('dotenv').config()
+
+// middlewares
 const app = express();
+app.use(express.json());
+
+app.use(cors())
+
 const port = 3000;
 
 
-
-
-const uri = "mongodb+srv://<db_username>:<db_password>@cluster0.3ftktcj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.3ftktcj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 
 const client = new MongoClient(uri, {
@@ -17,19 +23,29 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function run() {
+async function bootstrap() {
   try {
- 
     await client.connect();
-   
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    const database = client.db("Relive");
+    const userCollection = database.collection("Users");
+
+    app.post('/users',async(req,res)=>{
+      const user = req.body;
+      console.log(user);
+      
+      const result = await userCollection.insertOne(user);
+      res.send(result)
+    })
+
+
+
+
+
   } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
-run().catch(console.dir);
+bootstrap().catch(console.dir);
 
 
 
