@@ -6,9 +6,7 @@ require('dotenv').config()
 // middlewares
 const app = express();
 app.use(express.json());
-
 app.use(cors())
-
 const port = 3000;
 
 
@@ -29,10 +27,9 @@ async function bootstrap() {
     const database = client.db("Relive");
     const userCollection = database.collection("Users");
 
+    // user route
     app.post('/users',async(req,res)=>{
       const user = req.body;
-      console.log(user);
-      
       const result = await userCollection.insertOne(user);
       res.send(result)
     })
