@@ -26,6 +26,7 @@ async function bootstrap() {
     await client.connect();
     const database = client.db("Relive");
     const userCollection = database.collection("Users");
+    const bookingCollection = database.collection("Appointments");
 
     // user route
     app.post('/users',async(req,res)=>{
@@ -34,6 +35,13 @@ async function bootstrap() {
       res.send(result)
     })
 
+
+    // booking appointments
+    app.post('/bookings',async(req,res)=>{
+      const booking = req.body;
+     const result = await bookingCollection.insertOne(booking);
+     res.send(result)
+    })
 
 
 
