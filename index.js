@@ -25,8 +25,23 @@ async function bootstrap() {
   try {
     await client.connect();
     const database = client.db("Relive");
+    const appointmentsOptionCollection = database.collection("AppointmentOptions");
     const userCollection = database.collection("Users");
     const bookingCollection = database.collection("Appointments");
+
+
+    app.get("/appointmentsOptions",async (req,res)=>{
+      const query= {};
+      const result = await appointmentsOptionCollection.find(query).toArray();
+      res.send(result)
+    })
+
+    app.get('/appointmentSpecialty', async(req,res)=>{
+      const query = {};
+      const result = await appointmentsOptionCollection.find(query).project({name:1,_id:0}).toArray();
+      res.send(result)
+    })
+
 
     // user route
     app.post('/users', async (req, res) => {
@@ -52,6 +67,15 @@ async function bootstrap() {
       }
       const result = await userCollection.updateOne(filter,updatedDoc,option);
       res.send(result)
+    })
+
+
+    // admin check 
+    app.get("/users/admin/:email",async(req,res)=>{
+      const email  = req.params.email;
+      const query = {email};
+      const user = await userCollection.findOne(query);
+      res.send( {isAdmin: user?.role === 'admin'})
     })
 
 
